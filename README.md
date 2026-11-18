@@ -1,8 +1,8 @@
 # GLM-5.3 Flash M288 Mosaic 12L on one NVIDIA GB10
 
-## GR8 turn-tail on one GB10
+## GR8 on a single Spark
 
-In a six-turn code review on one ASUS GX10, enabling turn-tail cut median time to first token by **37%**, from 3.46 s to 2.17 s. At eight simultaneous sessions, the median for the eight opening turns rose from 10.04 s to 49.91 s. Both runs used a fresh 4G SSD prompt cache. [Run the GR8 recipe](gr8/) · [Read the benchmark and raw timings](gr8/results/2026-11-18-gx10/)
+**40.7 tok/s** single-stream decode on an ASUS GX10. Turn-tail cut median first-token wait from 3.46 s to 2.17 s in a six-turn, single-session review. [Run the GR8 recipe](gr8/) · [Raw results, including eight concurrent sessions](gr8/results/2026-11-18-gx10/)
 
 ## Run it
 

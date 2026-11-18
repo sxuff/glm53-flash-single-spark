@@ -2,11 +2,11 @@
 
 Run the text model on one NVIDIA GB10 with KindlingAI's EXLR8 bit201 checkpoint, INT4 KV cache and adaptive DFlash2 decoding. The turn-tail patch lets a follow-up request reuse more of the preceding prompt. This recipe uses the same engine source and cache settings as the November 18 ASUS Ascent GX10 comparison.
 
-## Measured on one GX10
+## 40.7 tok/s on a single Spark
 
-![GLM-5.3 Flash median first token with GR8 turn-tail off and on. One session, six turns: 3.46 to 2.17 seconds. Opening turns at eight sessions: 10.04 to 49.91 seconds.](results/2026-11-18-gx10/turn-tail-x.png)
+![GLM-5.3 Flash on a single Spark. Single-stream decode averaged 40.7 tok/s. In one six-turn session, median first-token wait fell from 3.46 to 2.17 seconds with turn-tail.](results/2026-11-18-gx10/turn-tail-x.png)
 
-With turn-tail enabled, median time to first token across six single-session turns was **2.17 s**, compared with **3.46 s** with the patch off. The share of prompt tokens reused rose from **72.7% to 84.6%**. At eight concurrent sessions all eight opening turns missed the cache with the patch on. The full 48-turn replay took **268.8 s** on and **249.4 s** off. One off/on pair, same model, same image, fresh 4G prompt-cache tier in each arm.
+On one ASUS GX10, single-stream decode averaged **40.71 tok/s** with turn-tail on and **40.83 tok/s** off across four prompt medians. In one six-turn session, median first-token wait fell from **3.46 s to 2.17 s**. At eight concurrent sessions, all eight opening turns missed the cache with turn-tail on, and the 48-turn replay took 268.8 s on versus 249.4 s off. Both arms used a fresh 4G SSD prompt cache.
 
 [Full results and per-turn timings](results/2026-11-18-gx10/README.md) · [Result card](results/2026-11-18-gx10/turn-tail.png)
 
