@@ -1,0 +1,22 @@
+[
+  {
+    "category": "code",
+    "prompt": "[gMASK]<sop><|system|>Reasoning Effort: Max<|user|>Implement a production-quality Python module that parses a stream of Server-Sent Events from an iterable of bytes, yields decoded JSON data objects, handles comments and multi-line data fields, and stops on [DONE]. Include type hints, a docstring, validation, and focused unit tests. Continue until the implementation and tests are complete.<|assistant|><think>",
+    "seed": 42
+  },
+  {
+    "category": "math",
+    "prompt": "[gMASK]<sop><|system|>Reasoning Effort: Max<|user|>Solve this carefully and show the full derivation: a decoder produces one verified token per base-model step without speculation. A speculative method proposes k tokens; position i is accepted only if all earlier positions were accepted. Derive expected verified tokens per step from conditional acceptance probabilities, then evaluate k=4 for p=[0.82,0.61,0.40,0.20]. Discuss proposal overhead, the break-even condition, and two numerical edge cases in at least 500 tokens.<|assistant|><think>",
+    "seed": 42
+  },
+  {
+    "category": "prose",
+    "prompt": "[gMASK]<sop><|system|>Reasoning Effort: Max<|user|>Write a self-contained technical explanation of how unified CPU/GPU memory changes large-language-model inference on a single workstation. Use complete paragraphs, include benefits and bottlenecks, and do not use a table. Continue for at least 500 tokens.<|assistant|><think>",
+    "seed": 42
+  },
+  {
+    "category": "structured",
+    "prompt": "[gMASK]<sop><|system|>Reasoning Effort: Max<|user|>Output the integers from 1 through 260 in order. Put exactly one space between integers. Do not omit, repeat, explain, or add any other text.<|assistant|><think>",
+    "seed": 42
+  }
+]

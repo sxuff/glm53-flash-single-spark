@@ -1,0 +1,6 @@
+caches:
+  spare: {kind: spare_ram, floor: 2G}
+tiers:
+  - cache: spare
+    store:
+      ssd: {path: /var/lib/gr8/prompts, size_per_rank: 4G, persist: true}

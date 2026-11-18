@@ -1,0 +1,2 @@
+FROM ghcr.io/kindlingai/glm-5.3-flash-exlr8-1x-spark@sha256:76e6fe0d4cf9d83645bb274e308714e0f3c471ead640db839689d4142f9b5974 AS sxuff-turn-tail
+COPY --from=dist-flash-int4 /bin/g6m4_flash-int4 /opt/gr8/bin/g6m4_flash-int4

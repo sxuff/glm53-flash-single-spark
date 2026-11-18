@@ -1,0 +1,6 @@
+warmup {'prompt_tokens': 4398, 'cached_tokens': 0, 'latency_s': 10.833728900004644}
+rep 1 level 1: 6 turns, wall 42.5s, output 22.6 tok/s
+rep 1 level 2: 12 turns, wall 68.6s, output 25.6 tok/s
+rep 1 level 4: 24 turns, wall 108.9s, output 28.0 tok/s
+rep 1 level 8: 48 turns, wall 268.8s, output 32.2 tok/s
+ALL_DONE 90

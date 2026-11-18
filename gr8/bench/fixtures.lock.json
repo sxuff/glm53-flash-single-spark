@@ -1,0 +1,147 @@
+{
+  "pillow": {
+    "repo": "python-pillow/Pillow",
+    "commit": "bb1d8e8ab8d29048624d96e3ee53cecf7c13d13d",
+    "version": "12.3.0",
+    "files": [
+      {
+        "path": ".venv/lib/python3.12/site-packages/PIL/AvifImagePlugin.py",
+        "sha256": "2ab961497bdd1519461deccb6581daf6bdc282f6dfba77d3ba72c630b5d8946d"
+      },
+      {
+        "path": ".venv/lib/python3.12/site-packages/PIL/BlpImagePlugin.py",
+        "sha256": "615058c368c247d06baa095fe99756f39913153eebe2307f2262699cd09f7967"
+      },
+      {
+        "path": ".venv/lib/python3.12/site-packages/PIL/BmpImagePlugin.py",
+        "sha256": "e0067eb268d1257de5a1d746652938a39107a06eb5e3fe415d31ee07b7a83b0f"
+      },
+      {
+        "path": ".venv/lib/python3.12/site-packages/PIL/DdsImagePlugin.py",
+        "sha256": "85cf455296d054ac95c971d03cd3a8ea245cba2d1138b495d3533c2333f09050"
+      },
+      {
+        "path": ".venv/lib/python3.12/site-packages/PIL/EpsImagePlugin.py",
+        "sha256": "94cb1da75871ec97ac6cb07bff57e5809929810ec9d5140fbed555e815adbc81"
+      },
+      {
+        "path": ".venv/lib/python3.12/site-packages/PIL/ExifTags.py",
+        "sha256": "61c257add6fffd463aa788e37f998b3920c57fe931db10faf9bd921eef36bdf3"
+      },
+      {
+        "path": ".venv/lib/python3.12/site-packages/PIL/FpxImagePlugin.py",
+        "sha256": "f7175b4dac1e2d40e9a29b8a64309e1c10c6b196e36e82f36778fe93eb37e125"
+      },
+      {
+        "path": ".venv/lib/python3.12/site-packages/PIL/GifImagePlugin.py",
+        "sha256": "fe956c85ac3a65ba9f01daec1acc3fc58b485dabcf25c90fe9b686039acae361"
+      },
+      {
+        "path": ".venv/lib/python3.12/site-packages/PIL/IcnsImagePlugin.py",
+        "sha256": "42ed4565d672c7eb1b5a8803e623661fb870b92dc1911717b2a20316c1ab8620"
+      },
+      {
+        "path": ".venv/lib/python3.12/site-packages/PIL/IcoImagePlugin.py",
+        "sha256": "506cc80e5434d9907e54912ca3223b616993c76e99881d841c9675aaf076f094"
+      },
+      {
+        "path": ".venv/lib/python3.12/site-packages/PIL/ImImagePlugin.py",
+        "sha256": "f2c04e032ef196a3fbdb6b175a19c99f85680614c1cdb6504ed7d6fd7b1679f5"
+      },
+      {
+        "path": ".venv/lib/python3.12/site-packages/PIL/Image.py",
+        "sha256": "04af3f2db7ffdd61e829fa7aa8f5481d394a0a4129a8fd8aa5b13908928fcd6d"
+      },
+      {
+        "path": ".venv/lib/python3.12/site-packages/PIL/ImageChops.py",
+        "sha256": "1848e5ca67280ed03938e788c505485fde810feb3a01785bed39922d89f6b548"
+      },
+      {
+        "path": ".venv/lib/python3.12/site-packages/PIL/ImageCms.py",
+        "sha256": "dc00c0fe9e2c479ab41f2d3d1adf65e579e67d9786a84328c224b5c6cd6ce883"
+      },
+      {
+        "path": ".venv/lib/python3.12/site-packages/PIL/ImageColor.py",
+        "sha256": "20603d0b6ba67840ff1334b60af8fa2ac53456eb42f51b2d58860f7bcb83b159"
+      },
+      {
+        "path": ".venv/lib/python3.12/site-packages/PIL/ImageDraw.py",
+        "sha256": "e83a5fc1f270e69f243e6cbcdd5cc548e997199aab276fa19a67ded591bb3c9a"
+      },
+      {
+        "path": ".venv/lib/python3.12/site-packages/PIL/ImageDraw2.py",
+        "sha256": "7b04d8392e62dba3c1069aaecca187b12cda34752e22ff5eda4614a1bb8383cb"
+      },
+      {
+        "path": ".venv/lib/python3.12/site-packages/PIL/ImageFile.py",
+        "sha256": "983c4f35e0c51046d4c636998ec77000cd2da208870a03b205e104cd0b2df629"
+      },
+      {
+        "path": ".venv/lib/python3.12/site-packages/PIL/ImageFilter.py",
+        "sha256": "1b85df7ac6aadc3d9daeeb3c8dc2c6f1682fc0eeb5927f6ca16da113b8277bf8"
+      },
+      {
+        "path": ".venv/lib/python3.12/site-packages/PIL/ImageFont.py",
+        "sha256": "24fa5feeb91b4bf63eaad0ebba08a8161e9c889d9fd056a37c928134097b9649"
+      }
+    ]
+  },
+  "flare": {
+    "repo": "NVIDIA/flare-local-inference",
+    "commit": "ca1f960edbf67d624f2d2948d2c111e8a6c8eb3c",
+    "guidance": {
+      "path": "AGENTS.md",
+      "sha256": "360ae20cfcdbb9a7731d6e767eaeadc904f9e3f8516f5079da26b43707e9a19f"
+    },
+    "prefill": [
+      {
+        "path": "eos/src/completion.rs",
+        "sha256": "7a1ffc04077a27f27e1380e77f35d41096e8dc16d1a052219643bdd210d7c100"
+      },
+      {
+        "path": "eos/src/ioring.rs",
+        "sha256": "705a2617ea5e38cea48616451e3d8517c395b170a61086341374d1f87bcb0d03"
+      },
+      {
+        "path": "eos/src/lib.rs",
+        "sha256": "326755bd1f2531ec5b594a6cda81935f1d1ef5d516284e76269546e1408743f1"
+      },
+      {
+        "path": "eos/src/unix.rs",
+        "sha256": "f45c0b1b3e32036e23cf48c4cf1c2b91bf829e770861f00212bf96d40e541592"
+      },
+      {
+        "path": "eos/src/windows.rs",
+        "sha256": "d58d574faa3420427fba3e3dc155fd282c44a032f4bd58b355c341bdfd07a206"
+      },
+      {
+        "path": "flare/examples/banner.rs",
+        "sha256": "f279ec2ba74220243ae0eec810e0a312af6e64f4c7d1be30ca3fdb7239442e27"
+      },
+      {
+        "path": "flare/examples/loading.rs",
+        "sha256": "49ca8c9aab355c01799a28294fd1b025cb5fa1482d5eab64627ad3946d0c1ad7"
+      },
+      {
+        "path": "flare/src/agent_client.rs",
+        "sha256": "174ee7e69687b6c49094103c90151d07b0ccd7221868260cf455a2a91cdfa69f"
+      },
+      {
+        "path": "flare/src/cache_commands.rs",
+        "sha256": "7e838c84660c6ab4daea2235c3d2f715218e135a17ec581c868a8a436d5465b5"
+      },
+      {
+        "path": "flare/src/cache_support.rs",
+        "sha256": "ae952a81b34ad0c9b977e634a6407c1075f0a5bba3703525e7ad0a1267ad30c0"
+      },
+      {
+        "path": "flare/src/cli.rs",
+        "sha256": "701cc203cb4a3f6550706b058404b88edad177aaed68105956c1e01e3e832e15"
+      }
+    ]
+  },
+  "n_chunks": 90,
+  "chunk_chars": 5200,
+  "chunks_sha256": "4336865eb15c8a403cc2dfd00fde2d5a123400fa6536a102399fe84a0d833a6a",
+  "prefill_sha256": "4a2022e34dd3b64720048ced7baa39a1385c4366b3a6c60a06db8d40db305d1e"
+}

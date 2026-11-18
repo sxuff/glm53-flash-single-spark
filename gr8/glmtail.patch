@@ -1,0 +1,128 @@
+diff --git a/engine/runtime/s2/flash_checkpoint.h b/engine/runtime/s2/flash_checkpoint.h
+index 21ab206..be0fbf0 100644
+--- a/engine/runtime/s2/flash_checkpoint.h
++++ b/engine/runtime/s2/flash_checkpoint.h
+@@ -44,6 +44,7 @@
+ #include <chrono>
+ #include <cstddef>
+ #include <cstdint>
++#include <cstdlib>
+ #include <cstring>
+ #include <functional>
+ #include <limits>
+@@ -68,6 +69,19 @@ inline const char* flash_cache_name(FlashCache m) {
+ // the last cold prefill quantum boundary at or before the prompt's prefilled rows (prompt_tokens - 1: the last prompt
+ // token runs as the prompt-tail step). 0 = none. A quantum is full only while more than one lane's rows are left, so
+ // every quantum but the last starts and ends on the grid.
++// GLMTAIL=1: the turn-tail point (scheduler-rs flash_tail_point, the same rule): the last 64-row page boundary at
++// or before row prompt_tokens - 1 - GLMTAIL_BACK (default 1). The scheduler ends a prefill quantum there. NOT
++// cold-exact: a later prompt that hits it is prefilled from a point a cold prefill's quanta do not end on.
++inline uint32_t flash_tail_point(uint32_t prompt_tokens) {
++    static const int back = [] {
++        const char* on = getenv("GLMTAIL");
++        if (!on || std::string(on) != "1") return -1;
++        const char* b = getenv("GLMTAIL_BACK");
++        return b ? atoi(b) : 1;
++    }();
++    if (back < 0 || prompt_tokens <= uint32_t(back) + 1) return 0;
++    return (prompt_tokens - 1 - uint32_t(back)) / 64 * 64;
++}
+ inline uint32_t aligned_point(uint32_t prompt_tokens, uint32_t grid) {
+     if (!grid || prompt_tokens < 1) return 0;
+     return (prompt_tokens - 1) / grid * grid;
+diff --git a/engine/runtime/s2/flash_native.cuh b/engine/runtime/s2/flash_native.cuh
+index f157aa8..0cfdca3 100644
+--- a/engine/runtime/s2/flash_native.cuh
++++ b/engine/runtime/s2/flash_native.cuh
+@@ -80,14 +80,15 @@ inline void serve_flash(FlashContext c, const BootstrapConfig& bc, int chunk) {
+     // (h.before_work), so a Resize announced during the prefill and landing at that boundary sizes the store first.
+     // Until then no step runs, and no other session's work touches the session's run or KDA slots: rows [0, capture_at)
+     // and its first KDA slot are the ones the quantum left
+-    struct Pending { int q; std::vector<int> tokens; uint64_t req; };
++    struct Pending { int q; std::vector<int> tokens; uint64_t req; bool tail = false; };
++    std::vector<bool> capture_tail(size_t(ks.sessions()));   // GLMTAIL: capture_at is a turn-tail point (not cold-exact)
+     std::vector<Pending> pending;
+     auto take_capture = [&] {
+         if (pending.empty()) return;
+         std::lock_guard<std::mutex> l(ck_mu);
+         for (const Pending& x : pending) {
+             const uint32_t at = uint32_t(x.tokens.size() - 1);
+-            const uint64_t gen = ck->capture(at, ks.base(x.q), x.q, pool.list(bound[size_t(x.q)]), x.tokens, capture_ns[size_t(x.q)], c.stream);
++            const uint64_t gen = ck->capture(at, ks.base(x.q), x.q, pool.list(bound[size_t(x.q)]), x.tokens, capture_ns[size_t(x.q)], c.stream, x.tail);
+             if (gen) fprintf(stderr, "# flash ckpt request %llu kept %u rows (session %d) as entry %llu (%llu blocks) in %.1f ms; %zu entries\n",
+                              (unsigned long long)x.req, at, x.q, (unsigned long long)gen,
+                              (unsigned long long)ck->last.blocks, ck->last.ms, ck->index().size());
+@@ -168,7 +169,7 @@ inline void serve_flash(FlashContext c, const BootstrapConfig& bc, int chunk) {
+     // GR8_GLM53F_CACHE at bind, after the session's cold reset: a hit's entry into the run's rows [0, reuse) and the
+     // session's first KDA slot, then the prompt's checkpoint point
+     auto bind_ckpt = [&](const Grant& g, int q, const std::vector<int>& list) {
+-        capture_at[size_t(q)] = 0;
++        capture_at[size_t(q)] = 0; capture_tail[size_t(q)] = false;
+         if (!ck) return;
+         capture_ns[size_t(q)] = g6rt::steering::cache_namespace(g.req.steering);
+         bool exact = true;   // the rows this request starts from are cold rows (no hit, or an aligned entry)
+@@ -188,7 +189,10 @@ inline void serve_flash(FlashContext c, const BootstrapConfig& bc, int chunk) {
+         // at == reuse: the entry that was hit holds these tokens. After a terminal hit no aligned entry is kept: its
+         // rows would not be cold rows
+         const uint32_t at = aligned_point(g.req.prompt_tokens, grid);
+-        if (exact && at > g.reuse) capture_at[size_t(q)] = at;
++        // GLMTAIL: the turn-tail point instead, also after any hit (the turns of a conversation chain on tail entries)
++        const uint32_t tail = flash_tail_point(g.req.prompt_tokens);
++        if (tail > at && tail > g.reuse) { capture_at[size_t(q)] = tail; capture_tail[size_t(q)] = true; }
++        else if (exact && at > g.reuse) capture_at[size_t(q)] = at;
+     };
+     h.bind = [&](const Grant& g) {
+         const int q = int(g.key.slot);
+@@ -415,7 +419,7 @@ inline void serve_flash(FlashContext c, const BootstrapConfig& bc, int chunk) {
+         uint32_t& at = capture_at[size_t(q)];
+         if (at && first + rows == at) {   // the quantum that ends at the prompt's last grid point
+             require(p.prompt.size() > at, "Flash checkpoint past the prompt");
+-            pending.push_back(Pending{q, std::vector<int>(p.prompt.begin(), p.prompt.begin() + at + 1), slot.req.id});
++            pending.push_back(Pending{q, std::vector<int>(p.prompt.begin(), p.prompt.begin() + at + 1), slot.req.id, bool(capture_tail[size_t(q)])});
+             at = 0;
+         }
+         if (on) c.main.s2on = c.draft.d.s2on = true;
+diff --git a/engine/scheduler-rs/src/scheduler.rs b/engine/scheduler-rs/src/scheduler.rs
+index 117d7ff..a0c8599 100644
+--- a/engine/scheduler-rs/src/scheduler.rs
++++ b/engine/scheduler-rs/src/scheduler.rs
+@@ -831,7 +831,16 @@ pub fn plan(c: &Config, s: &[Slot], want_decode: bool, stalled: &[bool]) -> Quan
+         } else {
+             u64::from(c.prefill_rows) * if c.two_lanes && left > c.prefill_rows { 2 } else { 1 }
+         };
+-        q.rows = if left != 0 { u64::from(left).min(cap) as u32 } else { 1 };
++        let mut rows = if left != 0 { u64::from(left).min(cap) as u32 } else { 1 };
++        // GLMTAIL: also end a quantum at the prompt's turn-tail point, so the Flash checkpoint taken there
++        // (flash_native.cuh bind_ckpt) holds the whole previous turn for the next request of the conversation
++        if left != 0 {
++            let t = flash_tail_point(p.req.prompt_tokens);
++            if t > p.prefilled && t - p.prefilled < rows {
++                rows = t - p.prefilled;
++            }
++        }
++        q.rows = rows;
+     }
+     q
+ }
+@@ -999,3 +1008,21 @@ pub fn complete_decode(c: &Config, s: &mut [Slot], st: &mut State, r: &[Completi
+     completed(c, s, st);
+     Ok(())
+ }
++
++/// GLMTAIL=1 (GLM-5.3-Flash checkpoints): the turn-tail point of a prompt, the last 64-row page boundary at or
++/// before row prompt_tokens - 1 - GLMTAIL_BACK (default 1: a chat template may render the previous turn's
++/// generation prompt differently in the next request). 0 = off. flash_checkpoint.h flash_tail_point is the same rule.
++pub fn flash_tail_point(prompt_tokens: u32) -> u32 {
++    use std::sync::OnceLock;
++    static BACK: OnceLock<Option<u32>> = OnceLock::new();
++    let back = *BACK.get_or_init(|| {
++        if std::env::var("GLMTAIL").ok().as_deref() != Some("1") {
++            return None;
++        }
++        Some(std::env::var("GLMTAIL_BACK").ok().and_then(|v| v.parse().ok()).unwrap_or(1))
++    });
++    match back {
++        Some(b) if prompt_tokens > b + 1 => (prompt_tokens - 1 - b) / 64 * 64,
++        _ => 0,
++    }
++}

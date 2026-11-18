@@ -1,0 +1,10 @@
+{
+  "turn_tail": "on",
+  "--cap": "327680",
+  "--s2-sessions": "8",
+  "--pf-lanes": "1",
+  "--prefill": "2048",
+  "--kv-format": "int4",
+  "--mtp": "1",
+  "--kv-store": "ssd:/var/lib/gr8/prompts,size=4G,persist=on,spare_ram_cache=on,spare_ram_floor=2G"
+}

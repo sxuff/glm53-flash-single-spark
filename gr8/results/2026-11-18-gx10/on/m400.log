@@ -1,0 +1,17 @@
+matched400:greedy:code:0         n=400 chunks=123 ttft=0.53 decode=35.74
+matched400:greedy:code:1         n=400 chunks=127 ttft=0.20 decode=35.23
+matched400:greedy:code:2         n=400 chunks=135 ttft=0.20 decode=33.57
+matched400:greedy:code:3         n=400 chunks=133 ttft=0.20 decode=33.70
+matched400:greedy:math:0         n=400 chunks=137 ttft=1.20 decode=33.94
+matched400:greedy:math:1         n=400 chunks=116 ttft=0.31 decode=37.73
+matched400:greedy:math:2         n=400 chunks=108 ttft=0.31 decode=40.14
+matched400:greedy:math:3         n=400 chunks=125 ttft=0.31 decode=35.69
+matched400:greedy:prose:0        n=400 chunks=176 ttft=0.33 decode=27.65
+matched400:greedy:prose:1        n=400 chunks=206 ttft=0.34 decode=28.36
+matched400:greedy:prose:2        n=400 chunks=206 ttft=0.34 decode=28.39
+matched400:greedy:prose:3        n=400 chunks=199 ttft=0.32 decode=27.48
+matched400:greedy:structured:0   n=400 chunks=59 ttft=0.29 decode=63.42
+matched400:greedy:structured:1   n=400 chunks=59 ttft=0.29 decode=63.01
+matched400:greedy:structured:2   n=400 chunks=59 ttft=0.31 decode=63.07
+matched400:greedy:structured:3   n=400 chunks=59 ttft=0.31 decode=63.05
+{"tag": "on", "extra": {}, "per_prompt_median": {"code": 33.69916562801294, "math": 37.72719582197795, "prose": 28.35719409012047, "structured": 63.048910590554755}, "mean_of_medians": 40.70811653266653}
