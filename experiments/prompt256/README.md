@@ -47,8 +47,8 @@ The patch builds on [TensorFold v0.6.5](https://github.com/ashhart/TensorFold/tr
 Apply the existing four recipe patches first. From the TensorFold checkout:
 
 ```bash
-git apply --check --whitespace=error-all /path/to/glm53-flash-single-gb10/patches/05-experimental-prompt256.patch
-git apply /path/to/glm53-flash-single-gb10/patches/05-experimental-prompt256.patch
+git apply --check --whitespace=error-all /path/to/glm53-flash-single-spark/patches/05-experimental-prompt256.patch
+git apply /path/to/glm53-flash-single-spark/patches/05-experimental-prompt256.patch
 ```
 
 Patch SHA-256: `b310ab10d9f025809fa5501513e027b75d129a7b40f953451860026fba78df4c`.
@@ -70,7 +70,7 @@ This snippet shows the two exercised substitutions, not a standalone launcher. K
 CPU policy/source checks, without loading Torch or a model:
 
 ```bash
-python3 /path/to/glm53-flash-single-gb10/experiments/prompt256/test_policy.py \
+python3 /path/to/glm53-flash-single-spark/experiments/prompt256/test_policy.py \
   --runtime /path/to/TensorFold
 ```
 

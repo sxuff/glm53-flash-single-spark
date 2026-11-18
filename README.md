@@ -1,15 +1,42 @@
-# GLM-5.3 Flash M288 Mosaic 12L on one NVIDIA GB10
+# GLM-5.3 Flash on a single Spark
 
-## GR8 on a single Spark
+![GLM-5.3 Flash on a single Spark. Single-stream decode averaged 40.7 tok/s. In one six-turn session, median first-token wait fell from 3.46 to 2.17 seconds with turn-tail.](gr8/results/2026-11-18-gx10/turn-tail-x.png)
 
-**40.7 tok/s** single-stream decode on an ASUS GX10. Turn-tail cut median first-token wait from 3.46 s to 2.17 s in a six-turn, single-session review. [Run the GR8 recipe](gr8/) · [Raw results, including eight concurrent sessions](gr8/results/2026-11-18-gx10/)
+**40.7 tok/s** single-stream decode for GLM-5.3 Flash on one NVIDIA GB10, served by GR8 with KindlingAI's EXLR8 bit201 checkpoint, INT4 KV cache and adaptive DFlash2 decoding. A turn-tail patch lets each follow-up reuse more of the previous prompt: in one six-turn session, median first-token wait fell from **3.46 s to 2.17 s**.
+
+Measured on an ASUS Ascent GX10 (NVIDIA GB10, the same chip as DGX Spark, 128 GB unified memory). [Full GR8 recipe](gr8/README.md) · [Raw results, including eight concurrent sessions](gr8/results/2026-11-18-gx10/README.md)
 
 ## Run it
 
-The command below launches the TensorFold Mosaic recipe.
+On an idle GB10 with Docker and the NVIDIA Container Toolkit:
 
 ```bash
-git clone https://github.com/sxuff/glm53-flash-single-gb10 && cd glm53-flash-single-gb10 && ./run.sh
+git clone https://github.com/sxuff/glm53-flash-single-spark.git
+cd glm53-flash-single-spark/gr8
+bash run.sh
+```
+
+The launcher builds the image if needed, serves on port 8000 with turn-tail enabled, and checks for a real chat answer. It needs 108 GiB of available host memory at startup and at least 87 GB of disk for the model and drafter. `bash run.sh --stop` shuts it down; `bash run.sh off` serves the patch-off baseline. [Requirements and individual steps](gr8/README.md#run-it)
+
+## Measured
+
+- **40.71 tok/s** decode with turn-tail on and **40.83 tok/s** off, mean of four prompt medians, single stream.
+- **3.46 s → 2.17 s** median first-token wait in one six-turn session.
+- At **eight concurrent sessions**, all eight opening turns missed the cache with turn-tail on, and the 48-turn replay took 268.8 s on against 249.4 s off. The patch helps a single multi-turn conversation, not parallel load.
+- The extra checkpoints are approximate and are not reloaded from the persistent store, so the gain assumes the server stays up through the conversation.
+
+[What the patch changes](gr8/README.md#what-the-patch-changes) · [Reproduce the comparison](gr8/README.md#reproduce-the-comparison)
+
+## Previous recipe: TensorFold Mosaic
+
+0xSero's GLM-5.3 Flash M288 Mosaic 12L on TensorFold, the earlier headline of this repository: 30.73 tok/s, vision, 262,144-token context. Everything below is unchanged from that recipe.
+
+### Run it
+
+The command below launches the TensorFold Mosaic recipe from the repository root.
+
+```bash
+git clone https://github.com/sxuff/glm53-flash-single-spark && cd glm53-flash-single-spark && ./run.sh
 ```
 
 Expected: **30.73 tok/s** decode, mean of four prompt medians, single stream — receipt: [`results/glm53-mosaic-decode-20261005.json`](results/glm53-mosaic-decode-20261005.json). That figure was measured at 2,560 cache slots; `run.sh` serves the 262,144-slot profile below.
@@ -22,11 +49,11 @@ The runtime image is pulled from `ghcr.io/sxuff/glm53-tensorfold-runtime@sha256:
 
 ![GLM-5.3 Flash M288 Mosaic 12L on one NVIDIA GB10: 30.73 tok/s with TensorFold](assets/glm53-mosaic-tensorfold-result-card.png)
 
-## What it is
+### What it is
 
 0xSero's [GLM-5.3-Flash EXL3 M288 Mosaic 12L](https://huggingface.co/0xSero/GLM-5.3-Flash-EXL3-Spark) takes the routed experts of 12 layers (3, 32, 33, 36 to 44) from the 3.05 bpw pack and keeps everything else, including the MTP layer, byte-identical to the 2.05 bpw base. 0xSero reports it better than the base on 32 of 32 test rows, +1.94 points of agreement with the full model and 5.9% lower perplexity. Those quality figures are 0xSero's and were not re-measured here. 0xSero's own runtime serves it at 9 to 10 tok/s without MTP.
 
-## Measured
+### Measured
 
 The TensorFold port refused any routed expert that was not 2-bit. [`03-mosaic-mixed-width-experts.patch`](patches/03-mosaic-mixed-width-experts.patch) admits 2-bit and 3-bit experts side by side; the grouped kernel already reads a width per expert. With it the mosaic runs with exact MTP:
 
@@ -45,7 +72,7 @@ Served with vision at 131,072 slots and a 7 GiB host reserve, it found a code pl
 
 Receipts: [decode and exactness](results/glm53-mosaic-decode-20261005.json) · [artifact census](results/glm53-mosaic-artifact-census-20261005.json) · [serving checks](results/glm53-mosaic-serving-checks-20261005.json)
 
-## Experimental fresh-prefill improvement
+### Experimental fresh-prefill improvement
 
 An optional prompt-only 256-row treatment improved fresh 32K/~64K prefill by **15.93–16.37%** in a one-pass matched screen at 262,144 slots. All six decode changes stayed within 1%, and all 20 primary token streams matched. Rates include the first sample, not isolated GPU prefill. Two strict serving checks failed identically in both arms, so **full qualification remains indeterminate and the default recipe below is unchanged**.
 
@@ -53,7 +80,7 @@ An optional prompt-only 256-row treatment improved fresh 32K/~64K prefill by **1
 
 [Experiment, integration and every decode cell](experiments/prompt256/README.md) · [measured receipt](results/glm53-mosaic-prefill-prompt256-20261012.json) · [optional patch](patches/05-experimental-prompt256.patch)
 
-## Experimental: up to three MTP drafts a round
+### Experimental: up to three MTP drafts a round
 
 The server drafts one token a round. TensorFold's own GLM decoder drafts up to three, adapting the depth to how often drafts are accepted. A verify pass reads about 5.5 GB that every row shares and about 2.0 GB per extra row, so more drafts can pay off when they land.
 
@@ -61,7 +88,7 @@ On four greedy prompts at 262,144 slots, three drafts averaged **33.79 tok/s aga
 
 [`06-experimental-mtp-depth.patch`](patches/06-experimental-mtp-depth.patch) adds `mtp_drafts` and `mtp_depth` to `serving/serving_defaults.json`. The default of one draft serves exactly as before. More drafts also need the unpublished loader to allocate 4-row decode buffers; the server refuses to start otherwise. Three drafts leave about 1.2 GiB less host memory free. CPU tests cover exactness against serial decoding, the thinking guard and the output cap. [Experiment notes, loader change and what is left to measure](experiments/mtp-depth/README.md) · [measured receipt](results/glm53-mosaic-mtp-depth-20261103.json)
 
-## Recipe
+### Recipe
 
 - Checkpoint: `0xSero/GLM-5.3-Flash-EXL3-Spark`, revision `2642851741fc833764e77d03039117be559dc83e` (96.1 GB, 12 shards)
 - TensorFold: `https://github.com/ashhart/TensorFold`, tag `v0.6.5`, commit `609ca419abecebdc5a059498a613680bd3aa847f`
@@ -89,7 +116,7 @@ git apply ../patches/04-stream-keepalive-content-delta.patch
 
 `serving/server.py` runs inside the container. As published in patch 02 it imports a runner and a loader from the host it was written on, and `serving/supervisor.py` hands the GPU over from that host's other services. [`07-portable-launcher.patch`](patches/07-portable-launcher.patch) (SHA-256 `acb9011ec342d359a51d65741e6350d4c1face7986a69d7d5ae7ebf683dada42`) adds the runner functions the server calls and the mosaic loader, both copied unchanged from the host, and points `server.py` at them. With it, `server.py` matches the host copy that served the mosaic, including its 5 GiB reserve and 98.5 GiB peak estimate. The supervisor is not used; `run.sh` starts the container with the supervisor's own `docker run` flags.
 
-## Serving profile
+### Serving profile
 
 - 262,144 slots, vision on, 5 GiB host reserve. Prompts up to 257,920 tokens, replies up to 16,384.
 - Defaults: temperature 0.3, top-p 0.95, min-p 0.05, reasoning effort high, and a new seed for every request that does not send one.
@@ -99,7 +126,7 @@ git apply ../patches/04-stream-keepalive-content-delta.patch
 - `GET /metrics` returns Prometheus counters and histograms. `GET /health` returns the running totals as JSON.
 - Extra request fields: `thinking_budget`, `thinking_loop`, `prefix_cache`, `seed`, `response_format: {"type": "json_object"}`.
 
-## Limits
+### Limits
 
 - **Set the client's context window to the server's.** A client that assumes a larger window than the server's keeps adding turns until the reply budget left after the prompt is too small, and the answer is cut short.
 - **A new prompt fills at about 290 tok/s.** A fresh 75K-token prompt waited 261 s; a 256K one would take about 15 minutes. Turns that resume stored state start in seconds.
@@ -109,7 +136,7 @@ git apply ../patches/04-stream-keepalive-content-delta.patch
 - **A turn that switches thinking off** fills its whole prompt again.
 - **Prompts beyond 75K tokens have not been checked on the mosaic.** The 75K retrieval and image checks ran once each, on a 131,072-slot copy.
 
-## Checks
+### Checks
 
 `serving/cpu_json.py`, `serving/cpu_prepare.py` and the landing suites under `tests/` run the request handling, prompt fill and state reuse on CPU with the checkpoint's tokenizer: 31, 12 and 146 tests pass on the patched tree. `tests/cpu/test_glm_mosaic_widths_cpu.py` (patch 03) checks the expert width gate; with the port's contracts, 38 tests pass on the fully patched tree. `serving/cache_equivalence.py` and `serving/depth_check.py` are the live checks.
 

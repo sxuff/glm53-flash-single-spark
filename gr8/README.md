@@ -1,4 +1,4 @@
-# GLM-5.3 Flash on one DGX Spark with GR8 turn-tail checkpoints
+# GLM-5.3 Flash on a single Spark with GR8 turn-tail checkpoints
 
 Run the text model on one NVIDIA GB10 with KindlingAI's EXLR8 bit201 checkpoint, INT4 KV cache and adaptive DFlash2 decoding. The turn-tail patch lets a follow-up request reuse more of the preceding prompt. This recipe uses the same engine source and cache settings as the November 18 ASUS Ascent GX10 comparison.
 
@@ -17,8 +17,8 @@ Use a Linux aarch64 GB10 with Docker, NVIDIA Container Toolkit, Docker Buildx, G
 On an idle Spark, clone the repository and launch the recipe. If you already extracted the recipe archive, run `bash run.sh` in the extracted directory.
 
 ```bash
-git clone https://github.com/sxuff/glm53-flash-single-gb10.git
-cd glm53-flash-single-gb10/gr8
+git clone https://github.com/sxuff/glm53-flash-single-spark.git
+cd glm53-flash-single-spark/gr8
 bash run.sh
 ```
 

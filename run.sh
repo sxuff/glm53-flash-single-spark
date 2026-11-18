@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # run.sh - one-command setup and launch for this recipe on one NVIDIA GB10.
 #
-#   git clone https://github.com/sxuff/glm53-flash-single-gb10 && cd glm53-flash-single-gb10 && ./run.sh
+#   git clone https://github.com/sxuff/glm53-flash-single-spark && cd glm53-flash-single-spark && ./run.sh
 #
 # Every pin and flag below is copied from this repo's README, patches or
 # receipts; the comment next to each value names its source. Nothing here
@@ -11,7 +11,7 @@ cd "$(dirname "$0")"
 REPO_DIR="$(pwd)"
 
 # ===================== recipe config (per repo) =============================
-RECIPE_NAME="glm53-flash-single-gb10"
+RECIPE_NAME="glm53-flash-single-spark"
 PORT=8002                                        # fixed: serving/server.py (patches/02) binds 127.0.0.1:8002; not configurable
 MODELS_DIR="${MODELS_DIR:-$HOME/models}"
 SRC_DIR="${SRC_DIR:-$HOME/src}"
