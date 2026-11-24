@@ -31,7 +31,8 @@ def engine_settings(container, mode):
     prefix = ["docker", "exec", container]
     argv = subprocess.check_output(prefix + ["cat", f"/proc/{pid}/cmdline"]).decode().rstrip("\0").split("\0")
     expected_flags = {
-        "--cap": "327680", "--s2-sessions": "8", "--pf-lanes": "1",
+        # serve.sh's CAP and SESS overrides (README.md, "If the boot runs out of memory")
+        "--cap": os.environ.get("CAP", "327680"), "--s2-sessions": os.environ.get("SESS", "8"), "--pf-lanes": "1",
         "--prefill": "2048", "--kv-format": "int4", "--mtp": "1",
     }
     flags = {flag: effective_arg(argv, flag) for flag in (*expected_flags, "--kv-store")}

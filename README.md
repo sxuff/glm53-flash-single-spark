@@ -18,6 +18,8 @@ bash run.sh
 
 The launcher builds the image if needed, serves on port 8000 with turn-tail enabled, and checks for a real chat answer. It needs 108 GiB of available host memory at startup and at least 87 GB of disk for the model and drafter. `bash run.sh --stop` shuts it down; `bash run.sh off` serves the patch-off baseline. [Requirements and individual steps](gr8/README.md#run-it)
 
+The measured settings boot only with about 113.5 GiB available. If the engine stops with "the rest of the boot needs 8.0", run `CAP=131072 bash run.sh` (or `SESS=4`); single-stream decode is the same. [If the boot runs out of memory](gr8/README.md#if-the-boot-runs-out-of-memory)
+
 ## Measured
 
 - **40.71 tok/s** decode with turn-tail on and **40.83 tok/s** off, mean of four prompt medians, single stream.

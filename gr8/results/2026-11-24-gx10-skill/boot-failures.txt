@@ -1,0 +1,9 @@
+# Boot stops, 2026-11-24 (GR8 gr8-tail:2, SESS=8, one GX10). arm | MemAvailable when the engine started | why it stopped
+ctl (CAP 327680, by hand) | MemAvailable 112.3 GiB | engine exited (2): g6: rank 0: 7.70 GiB left after the weights and part of a KV pool of 327680 tokens
+dpar (DRAFT_PAR=2, a no-op for Flash; the memory edge) | MemAvailable 113.3 GiB | engine exited (2): g6: rank 0: 7.98 GiB left after the weights and part of a KV pool of 262144 tokens
+ctl-c (control, CAP 262144) | MemAvailable 113.4 GiB | engine exited (2): g6: rank 0: 7.99 GiB left after the weights and part of a KV pool of 262144 tokens
+m2ks (MTP=2 + MTP_KSTOP=2) | MemAvailable 113.4 GiB | engine exited (2): g6: rank 0: 7.02 GiB left after the weights and part of a KV pool of 262144 tokens
+m2ks-c128 (MTP=2, CAP 131072) | MemAvailable 113.6 GiB | engine exited (2): g6: rank 0: 7.60 GiB left after the weights and part of a KV pool of 131072 tokens
+dflh (GR8_DFL_HEAD_I4=1) | MemAvailable 113.6 GiB | engine exited (2): g6: GR8_DFL_HEAD_I4: G.lm_head.mx.gv is not this rank's [vn/16][192][528] MXFP8 slice
+rej-t07 (--spec-accept rejection) | MemAvailable 113.6 GiB | engine exited (2): g6: Flash serve supports no prefix reuse or rejection sampling
+ctl-e (CAP 131072, first try) | n/a | gr8: --max-model-len 262144: more than CAP 131072, the KV pool a request comes from (fixed with MAX_MODEL_LEN=131058)
