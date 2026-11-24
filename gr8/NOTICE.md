@@ -11,4 +11,6 @@ The turn-tail checkpoint change and the GX10 measurements are by sxuff. GR8 and 
 | Target | [KindlingAI EXLR8 bit201, revision 901ad08](https://huggingface.co/kindlingai/glm-5.3-flash-exlr8-k2-k3-k4/tree/901ad084f0afd2400820504910d3e684133ce183). The model card identifies the MIT license. |
 | Drafter | [IncoAI GLM-5.3-Flash DFlash2, revision bf582e4](https://huggingface.co/incoai/GLM-5.3-Flash-DFlash2/tree/bf582e4eacc1810f76656d1811693ff6c6737d2a). The model card identifies CC BY-NC-ND 4.0. |
 
+The November 24 settings run ([results/2026-11-24-gx10-skill](results/2026-11-24-gx10-skill/README.md)) followed [0xSero](https://github.com/0xSero)'s [inference-optimisation skill](https://github.com/sybil-solutions/inference-optimisation-skill) (commit `fda968e`); its method and its `bench.py` ran unchanged on the GB10.
+
 The patch includes context from GR8, and the launch options and cache configuration follow KindlingAI's single-Spark recipe. Both upstream repositories carry the same MIT notice, reproduced in [GR8-LICENSE.txt](GR8-LICENSE.txt). The benchmark's separate attribution is in [bench/README.md](bench/README.md). Model files and pretrained drafter weights download from their respective repositories on first boot.

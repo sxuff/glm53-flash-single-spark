@@ -34,6 +34,17 @@ To switch to the patch-off baseline, run `bash run.sh --stop`, then `bash run.sh
 
 On the GX10 that produced these results, **`gr8-tail:2` is already built**. Use `export IMAGE=gr8-tail:2` for a new launch there. To verify the existing systemd-managed instance on port 8000, run `python3 smoke.py on --container glm53f-1x-spark`. Running a new instance on the same GB10 requires releasing the GPU first.
 
+### If the boot runs out of memory
+
+The measured settings (`CAP=327680`, eight session slots) need about 113.5 GiB of available memory when the engine starts, well above the launcher's 108 GiB check. On November 24 the same GX10 had 112.8–113.7 GiB available with the desktop and an agent running, and the boot stopped with `7.70 GiB left after the weights and part of a KV pool of 327680 tokens; the rest of the boot needs 8.0`. At `CAP=262144` it booted only when 113.5 GiB or more was available. Two settings make it boot reliably:
+
+```bash
+CAP=131072 bash run.sh   # the KV pool the sessions share; one request up to 131,058 tokens
+SESS=4 bash run.sh       # four session slots instead of eight, about 1.2 GB less (KDA state, 153 MB a slot)
+```
+
+`serve.sh` passes both to the image, sets `MAX_MODEL_LEN` to `CAP` less the 14 guard rows when `CAP` is below 262,144 (the image refuses a smaller `CAP` otherwise), and `smoke.py` checks the values it was given. Single-stream decode does not depend on `CAP`: 31.3–31.6 tok/s at 262,144 and 131,072 on the same benchmark. [Measurements](results/2026-11-24-gx10-skill/README.md)
+
 ## Reproduce the comparison
 
 With the GPU free, run the comparison from the recipe directory.
